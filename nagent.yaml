@@ -40,38 +40,100 @@
 
 
 ###########
----
-- name: Check and Upgrade NessusAgent
-  hosts: all
-  become: yes  # Ensure you have sudo privileges
+- name: Check if OS is RHEL 7, RHEL 8, or RHEL 9
+  block:
+    - name: Set OS version fact
+      set_fact:
+        os_version: "{{ ansible_distribution_major_version | int }}"
 
-  tasks:
-    - name: Check if NessusAgent is installed
-      command: rpm -q NessusAgent
-      register: nessus_installed
-      failed_when: nessus_installed.rc not in [0,1]
-      changed_when: false
+    - name: Fail if not RHEL 7, 8, or 9
+      fail:
+        msg: "This playbook only supports RHEL 7, RHEL 8, and RHEL 9"
+      when: ansible_distribution != 'RedHat' and os_version not in [7, 8, 9]
 
-    - name: Get version of NessusAgent if installed
-      command: rpm -q --queryformat '%{VERSION}' NessusAgent
-      when: nessus_installed.rc == 0
-      register: nessus_version
-      changed_when: false
+- name: Check if Nessus Agent is installed
+  shell: rpm -q NessusAgent
+  register: nessus_installed
+  ignore_errors: yes
+ 
 
-    - name: Display version of NessusAgent
-      debug:
-        msg: "Installed version of NessusAgent is {{ nessus_version.stdout }}"
-      when: nessus_installed.rc == 0
+- name: Display message if Nessus Agent is already installed
+  debug:
+    msg: "Nessus Agent is already installed on {{ inventory_hostname }}"
+  when: nessus_installed.rc == 0
 
-    - name: Upgrade NessusAgent if version is 10.5.1
-      block:
-        - name: Copy the NessusAgent RPM from local files directory
-          copy:
-            src: "{{ playbook_dir }}/files/NessusAgent-latest.rpm"
-            dest: "/tmp/NessusAgent-latest.rpm"
-        
-        - name: Upgrade NessusAgent using the RPM file
-          yum:
-            name: "/tmp/NessusAgent-latest.rpm"
-            state: present
-      when: nessus_installed.rc == 0 and nessus_version.stdout == "10.5.1"
+- name: Create directories for nessus agent
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /apps/tools/nessus_agent
+    - /opt/nessus_agent
+
+- name: Add bind mount to /etc/fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: "/apps/tools/nessus_agent /opt/nessus_agent none defaults,bind 0 0"
+    state: present
+
+- name: Mount the bind mount
+  become: true
+  command: mount --bind /apps/tools/nessus_agent /opt/nessus_agent
+  #  ansible.builtin.mount:
+  #  src: /apps/tools/nessus_agent
+  #  path: /opt/nessus_agent
+  #  fstype: none
+  #  opts: defaults,bind
+  #  state: mounted
+  #
+- name: Create a directory in /tmp/tenable if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: "/tmp/tenable"
+    state: "directory"
+    owner: "svc-ansible"
+    group: "svc-ansible"
+    mode: "0775"
+ 
+- block:
+    - name: Copy Nessus Agent RPM to /tmp
+      copy:
+        src: "files/NessusAgent-10.5.1-el{{ os_version }}.x86_64.rpm"
+        dest: "/tmp/tenable/NessusAgent-10.5.1-el{{ os_version }}.x86_64.rpm"
+        mode: '0755'
+
+    - name: Install Nessus Agent RPM
+      dnf:
+        name: "/tmp/tenable/NessusAgent-10.5.1-el{{ os_version }}.x86_64.rpm"
+        state: present
+        disable_gpg_check: yes
+
+    - name: Remove Nessus Agent RPM from /tmp after installation
+      file:
+        path: "/tmp/tenable/NessusAgent-10.5.1-el{{ os_version }}.x86_64.rpm"
+        state: absent
+
+  when: nessus_installed.rc != 0
+- name: Start Nessus Agent service
+  ansible.builtin.service:
+    name: nessusagent
+    state: started
+
+- name: Link Nessus Agent to manager
+  become: true
+  ansible.builtin.shell: 
+    /opt/nessus_agent/sbin/nessuscli agent link --key= --groups= --proxy-host= --proxy-port= --host=sensor.cloud.tenable.com --port=443 
+  register: link_result
+  ignore_errors: yes  # Ignore errors if the agent is already linked or if there are any issues
+
+#- name: Debug link result
+#  ansible.builtin.debug:
+#    var: link_result
+
+- name: Check Nessus Agent status
+  ansible.builtin.shell: /opt/nessus_agent/sbin/nessuscli agent status
+  register: agent_status
+
+- name: Display Nessus Agent status
+  ansible.builtin.debug:
+    var: agent_status.stdout_lines
