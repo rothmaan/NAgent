@@ -1,0 +1,35 @@
+---
+- name: Check and Upgrade NessusAgent
+  hosts: all
+  become: yes  # Ensure you have sudo privileges
+
+  tasks:
+    - name: Check if NessusAgent is installed
+      command: rpm -q NessusAgent
+      register: nessus_installed
+      failed_when: nessus_installed.rc not in [0,1]
+      changed_when: false
+
+    - name: Get version of NessusAgent if installed
+      command: rpm -q --queryformat '%{VERSION}' NessusAgent
+      when: nessus_installed.rc == 0
+      register: nessus_version
+      changed_when: false
+
+    - name: Display version of NessusAgent
+      debug:
+        msg: "Installed version of NessusAgent is {{ nessus_version.stdout }}"
+      when: nessus_installed.rc == 0
+
+    - name: Upgrade NessusAgent if version is 10.5.1
+      block:
+        - name: Copy the NessusAgent RPM from local files directory
+          copy:
+            src: "{{ playbook_dir }}/files/NessusAgent-latest.rpm"
+            dest: "/tmp/NessusAgent-latest.rpm"
+        
+        - name: Upgrade NessusAgent using the RPM file
+          yum:
+            name: "/tmp/NessusAgent-latest.rpm"
+            state: present
+      when: nessus_installed.rc == 0 and nessus_version.stdout == "10.5.1"
