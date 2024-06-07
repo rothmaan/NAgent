@@ -34,6 +34,16 @@
     mode: '0755'
   when: nessus_installed.rc == 0 and nessus_version.stdout != "10.5.1"
 
+- name: Debug - show path to RPM
+  debug:
+    msg: "Path to RPM: {{ playbook_dir }}/files/NessusAgent-10.5.1-el{{ os_version }}.x86_64.rpm"
+  when: nessus_installed.rc == 0 and nessus_version.stdout != "10.5.1"
+
+- name: Debug - NessusAgent is installed and version
+  debug:
+    msg: "NessusAgent is installed, version is {{ nessus_version.stdout }}"
+  when: nessus_installed.rc == 0 and nessus_version.stdout != "10.5.1"
+
 - name: Upgrade NessusAgent if it is installed and not already the desired version
   block:
     - name: Copy the NessusAgent RPM from local files directory
