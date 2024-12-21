@@ -37,73 +37,6 @@ Red Hat Enterprise Linux Server release 7.9 (Maipo)
 
 
 ##
-[svc-ansible@rchanstwr01v mrss_tenable]$ ansible-playbook -i inventory install_tenable.yml
-
-PLAY [Set OS Version Fact] ***********************************************************************************************************************************************************************************************************************
-
-TASK [Gathering Facts] ***************************************************************************************************************************************************************************************************************************
-ok: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [Set OS version fact] ***********************************************************************************************************************************************************************************************************************
-ok: [abrdmdcspba2q2v.vzbi.com]
-
-PLAY [Install Tenable Tools] *********************************************************************************************************************************************************************************************************************
-
-TASK [Gathering Facts] ***************************************************************************************************************************************************************************************************************************
-ok: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Debug OS facts] ******************************************************************************************************************************************************************************************************************
-ok: [abrdmdcspba2q2v.vzbi.com] => {
-    "msg": "ansible_os_family=RedHat, ansible_distribution_major_version=7"
-}
-
-TASK [tenable : Fail if not RHEL 7, 8, or 9] *****************************************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Check if NessusAgent is installed] ***********************************************************************************************************************************************************************************************
-ok: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Get version of NessusAgent if installed] *****************************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Display version of NessusAgent] **************************************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Display upgrade version] *********************************************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Copy the NessusAgent RPM from local files directory] *****************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Upgrade NessusAgent using the RPM file] ******************************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Remove NessusAgent RPM from /tmp after installation] *****************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-TASK [tenable : Restart NessusAgent service] *****************************************************************************************************************************************************************************************************
-skipping: [abrdmdcspba2q2v.vzbi.com]
-
-PLAY RECAP ***************************************************************************************************************************************************************************************************************************************
-abrdmdcspba2q2v.vzbi.com   : ok=5    changed=0    unreachable=0    failed=0    skipped=8    rescued=0    ignored=0   
-
-[svc-ansible@rchanstwr01v mrss_tenable]$ 
-###
-
-
-
----
-- name: "Install Tenable Tools"
-  hosts: all
-  become: yes
-  gather_facts: yes
-  roles:
-    - role: tenable
-  tags:
-    - tenable
-
-
-####
 ---
 # 1. Set the OS version fact
 - name: Set OS version fact
@@ -119,13 +52,13 @@ abrdmdcspba2q2v.vzbi.com   : ok=5    changed=0    unreachable=0    failed=0    s
 - name: Fail if not RHEL 7, 8, or 9
   fail:
     msg: "This role only supports RHEL 7, 8, and RHEL 9"
-  when: ansible_os_family != 'RedHat' or os_version not in [7, 8, 9]
+  when: not (ansible_os_family == 'RedHat' and os_version in [7, 8, 9])
 
 # 4. Check if NessusAgent is installed
 - name: Check if NessusAgent is installed
   command: rpm -q NessusAgent
   register: nessus_installed
-  failed_when: nessus_installed.rc not in [0,1]
+  failed_when: nessus_installed.rc not in [0, 1]
   changed_when: false
 
 # 5. Display message if NessusAgent is already installed
@@ -215,6 +148,10 @@ abrdmdcspba2q2v.vzbi.com   : ok=5    changed=0    unreachable=0    failed=0    s
   register: agent_status
 
 # 14. Display NessusAgent status
+- name: Display NessusAgent status
+  ansible.builtin.debug:
+    var: agent_status.stdout_lines
+
 - name: Display NessusAgent status
   ansible.builtin.debug:
     var: agent_status.stdout_lines
