@@ -88,35 +88,36 @@ Red Hat Enterprise Linux Server release 7.9 (Maipo)
 
 # 8. Mount the bind mount
 - name: Mount the bind mount
+  ansible.builtin.command:
+    cmd: mount --bind /apps/tools/nessus_agent /opt/nessus_agent
   become: true
-  command: mount --bind /apps/tools/nessus_agent /opt/nessus_agent
 
 # 9. Create a directory in /tmp/tenable if it does not exist
 - name: Create a directory in /tmp/tenable if it does not exist
-  become: true
   ansible.builtin.file:
     path: "/tmp/tenable"
     state: directory
     owner: "svc-ansible"
     group: "svc-ansible"
     mode: "0775"
+  become: true
 
 # 10. Install NessusAgent if not already installed
 - block:
     - name: Copy NessusAgent RPM to /tmp/tenable
-      copy:
+      ansible.builtin.copy:
         src: "files/NessusAgent-10.7.3-el{{ os_version }}.x86_64.rpm"
         dest: "/tmp/tenable/NessusAgent-10.7.3-el{{ os_version }}.x86_64.rpm"
         mode: '0755'
 
     - name: Install NessusAgent RPM
-      yum:
+      ansible.builtin.yum:
         name: "/tmp/tenable/NessusAgent-10.7.3-el{{ os_version }}.x86_64.rpm"
         state: present
         disable_gpg_check: yes
 
     - name: Remove NessusAgent RPM from /tmp after installation
-      file:
+      ansible.builtin.file:
         path: "/tmp/tenable/NessusAgent-10.7.3-el{{ os_version }}.x86_64.rpm"
         state: absent
 
@@ -130,7 +131,6 @@ Red Hat Enterprise Linux Server release 7.9 (Maipo)
 
 # 12. Link NessusAgent to manager
 - name: Link NessusAgent to manager
-  become: true
   ansible.builtin.shell: >
     /opt/nessus_agent/sbin/nessuscli agent link
     --key=fead1abb54958281b1ae15d5c1180d2319004ee327df785498d6b111aa12a25f
@@ -141,6 +141,7 @@ Red Hat Enterprise Linux Server release 7.9 (Maipo)
     --port=443
   register: link_result
   ignore_errors: yes
+  become: true
 
 # 13. Check NessusAgent status
 - name: Check NessusAgent status
@@ -152,6 +153,3 @@ Red Hat Enterprise Linux Server release 7.9 (Maipo)
   ansible.builtin.debug:
     var: agent_status.stdout_lines
 
-- name: Display NessusAgent status
-  ansible.builtin.debug:
-    var: agent_status.stdout_lines
