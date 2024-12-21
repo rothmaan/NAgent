@@ -19,7 +19,7 @@
 - name: Fail if not RHEL 7, 8, or 9
   fail:
     msg: "This role only supports RHEL 7, RHEL 8, and RHEL 9"
-  when: ansible_distribution != 'RedHat' or os_version not in [7, 8, 9]
+  when: ansible_distribution not in ['Red Hat Enterprise Linux'] or os_version not in [7, 8, 9]
 
 - name: Check if NessusAgent is installed
   command: rpm -q NessusAgent
