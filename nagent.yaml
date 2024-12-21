@@ -68,18 +68,14 @@ Red Hat Enterprise Linux Server release 7.9 (Maipo)
 
 
 ---
-- name: Set OS version fact
-  set_fact:
-    os_version: "{{ ansible_distribution_major_version | int }}"
-
 - name: Debug OS facts
   debug:
-    msg: "ansible_os_family={{ ansible_os_family }}, os_version={{ os_version }}"
+    msg: "ansible_os_family={{ ansible_os_family }}, ansible_distribution_major_version={{ ansible_distribution_major_version }}"
 
 - name: Fail if not RHEL 7, 8, or 9
   fail:
     msg: "This role only supports RHEL 7, 8, and RHEL 9"
-  when: ansible_os_family != 'RedHat' or os_version not in [7, 8, 9]
+  when: ansible_os_family != 'RedHat' or (ansible_distribution_major_version|int not in [7,8,9])
 
 - name: Check if NessusAgent is installed
   command: rpm -q NessusAgent
@@ -107,20 +103,20 @@ Red Hat Enterprise Linux Server release 7.9 (Maipo)
   block:
     - name: Copy the NessusAgent RPM from local files directory
       copy:
-        src: "roles/upgrade_nessus_agent/files/NessusAgent-10.6.4-el{{ os_version }}.x86_64.rpm"
-        dest: "/tmp/tenable/NessusAgent-10.6.4-el{{ os_version }}.x86_64.rpm"
+        src: "roles/upgrade_nessus_agent/files/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
+        dest: "/tmp/tenable/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
       when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
 
     - name: Upgrade NessusAgent using the RPM file
       yum:
-        name: "/tmp/tenable/NessusAgent-10.6.4-el{{ os_version }}.x86_64.rpm"
+        name: "/tmp/tenable/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
         state: latest
         disable_gpg_check: yes
       when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
 
     - name: Remove NessusAgent RPM from /tmp after installation
       file:
-        path: "/tmp/tenable/NessusAgent-10.6.4-el{{ os_version }}.x86_64.rpm"
+        path: "/tmp/tenable/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
         state: absent
       when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
 
