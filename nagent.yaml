@@ -88,27 +88,6 @@ abrdmdcspba2q2v.vzbi.com   : ok=5    changed=0    unreachable=0    failed=0    s
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 - name: "Install Tenable Tools"
   hosts: all
@@ -120,8 +99,7 @@ abrdmdcspba2q2v.vzbi.com   : ok=5    changed=0    unreachable=0    failed=0    s
     - tenable
 
 
-
-
+##
 ---
 - name: Debug OS facts
   debug:
@@ -130,7 +108,7 @@ abrdmdcspba2q2v.vzbi.com   : ok=5    changed=0    unreachable=0    failed=0    s
 - name: Fail if not RHEL 7, 8, or 9
   fail:
     msg: "This role only supports RHEL 7, 8, and RHEL 9"
-  when: ansible_os_family != 'RedHat' or (ansible_distribution_major_version|int not in [7,8,9])
+  when: ansible_os_family != 'RedHat' or (ansible_distribution_major_version|int not in [7, 8, 9])
 
 - name: Check if NessusAgent is installed
   command: rpm -q NessusAgent
@@ -138,45 +116,33 @@ abrdmdcspba2q2v.vzbi.com   : ok=5    changed=0    unreachable=0    failed=0    s
   failed_when: nessus_installed.rc not in [0,1]
   changed_when: false
 
-- name: Get version of NessusAgent if installed
-  command: rpm -q --queryformat '%{VERSION}' NessusAgent
-  when: nessus_installed.rc == 0
-  register: nessus_version
-  changed_when: false
-
-- name: Display version of NessusAgent
+- name: Display message if NessusAgent is already installed
   debug:
-    msg: "Installed version of NessusAgent is {{ nessus_version.stdout }}"
+    msg: "NessusAgent is already installed."
   when: nessus_installed.rc == 0
 
-- name: Display upgrade version
-  debug:
-    msg: "Upgrading NessusAgent to version 10.6.4"
-  when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
-
-- name: Upgrade NessusAgent if not already the desired version
+- name: Install NessusAgent if not installed
   block:
-    - name: Copy the NessusAgent RPM from local files directory
+    - name: Copy the NessusAgent RPM
       copy:
         src: "roles/upgrade_nessus_agent/files/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
         dest: "/tmp/tenable/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
-      when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
 
-    - name: Upgrade NessusAgent using the RPM file
+    - name: Install NessusAgent using the RPM file
       yum:
         name: "/tmp/tenable/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
-        state: latest
+        state: present
         disable_gpg_check: yes
-      when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
 
     - name: Remove NessusAgent RPM from /tmp after installation
       file:
         path: "/tmp/tenable/NessusAgent-10.6.4-el{{ ansible_distribution_major_version }}.x86_64.rpm"
         state: absent
-      when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
 
-    - name: Restart NessusAgent service
+    - name: Start NessusAgent service
       service:
         name: nessusagent
-        state: restarted
-      when: nessus_installed.rc == 0 and nessus_version.stdout != "10.6.4"
+        state: started
+  when: nessus_installed.rc == 1
+
+
