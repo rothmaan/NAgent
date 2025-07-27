@@ -87,3 +87,299 @@ touch sysstat_common/{tasks/main.yml,templates/{sysstat.erb.j2,sysstat.erb.j2.ba
 touch umask/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/{backup,main.yml},templates/{adduser.conf.j2,bashrc.j2,default_umask.fish.j2,default_umask.sh.j2,profile.j2,zshrc.j2},tests/{inventory,test.yml},vars/main.yml}
 
 touch usergroupdir/{defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/{main_admin.yml,main_adm.yml,main_build.yml,main_ecs.yml,main_engine.yml,main_et.yml,main_ratt.yml,main_rnd.yml,main_sre.yml,main.yml},tests/{inventory,test.yml}}
+
+############### post-installs
+[othmara@rchanstwr01v mrss-iptf-project-01]$ cat POST_INSTALL_IPTF_ET_DEV.yml
+---
+- name: "motd Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: motd
+  tags: motd
+
+- name: "logindefs Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: logindefs
+  tags: logindefs
+
+- name: "Dns configuration with Named service"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: dns_with_named
+  tags: dns_with_named
+
+- name: "create user and group with directories and set permissions"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: usergroupdir
+  tags: usergroupdir
+
+- name:  adding nftables rules
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+   - role: nftables_iptf
+  tags: nftables_iptf
+
+- name: "Configuring SSHD File"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sshd
+  tags: sshd
+
+- name: "Configure the ntpchrony"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: ntpchrony
+  tags: ntpchrony
+
+- name: "System Stat  Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sysstat_common
+  tags: sysstat_common
+
+- name: "Syslog Configuration to Server"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: syslog
+  tags: syslog
+
+- name: "Setting for systems log files rotation Logrotate"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: logrotate
+  tags: logrotate
+
+- name: "sudoer files configuration in sudoers.d directory"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sudo_iptf
+  tags: sudo_iptf
+
+- name: "SNMP configurations"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: snmp
+  tags: snmp
+
+  #- name: "Security limits Configuration"
+  #hosts: "{{ group_name }}"
+  #become: True
+  #ignore_errors: True
+  #roles:
+  #  - role: seclimit
+  #tags: seclimit
+
+- name: "Configure svc-ansible-apps account"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles: 
+    - role: svc-ansible-apps
+  tags: svc-ansible-apps
+
+- name: "configure links"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles: 
+    - role: link
+  tags: link
+
+- name: "packages_add"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: packages_add
+  tags: packages_add
+
+- name: "sysctl"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sysctl
+  tags: sysctl
+
+- name: "services Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: services
+  tags: services
+
+[othmara@rchanstwr01v mrss-iptf-project-01]$ 
+
+
+###################post_install prod #####################
+[othmara@rchanstwr01v mrss-iptf-project-01]$ cat POST_INSTALL_IPTF_ET_CHT.yml
+---
+- name: "motd Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: motd
+  tags: motd
+
+- name: "logindefs Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: logindefs
+  tags: logindefs
+
+- name: "Dns configuration with Named service"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: dns_with_named_cht
+  tags: dns_with_named_cht
+
+- name: "create user and group with directories and set permissions"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: usergroupdir
+  tags: usergroupdir
+
+- name:  adding nftables rules
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+   - role: nftables_iptf
+  tags: nftables_iptf
+
+- name: "Configuring SSHD File"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sshd
+  tags: sshd
+
+- name: "Configure the ntpchrony"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: ntpchrony
+  tags: ntpchrony
+
+- name: "System Stat  Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sysstat_common
+  tags: sysstat_common
+
+- name: "Syslog Configuration to Server"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: syslog
+  tags: syslog
+
+- name: "Setting for systems log files rotation Logrotate"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: logrotate
+  tags: logrotate
+
+- name: "sudoer files configuration in sudoers.d directory"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sudo_iptf
+  tags: sudo_iptf
+
+- name: "SNMP configurations"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: snmp
+  tags: snmp
+
+- name: "Security limits Configuration"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: seclimit
+  tags: seclimit
+
+- name: "Configure svc-ansible-apps account"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles: 
+    - role: svc-ansible-apps
+  tags: svc-ansible-apps
+
+- name: "configure links"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles: 
+    - role: link
+  tags: link
+
+- name: "packages_add"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: packages_add
+  tags: packages_add
+
+- name: "sysctl"
+  hosts: "{{ group_name }}"
+  become: True
+  ignore_errors: True
+  roles:
+    - role: sysctl
+  tags: sysctl
+
+[othmara@rchanstwr01v mrss-iptf-project-01]$
+
+
+
+
+
