@@ -1,0 +1,89 @@
+# Create the directories
+mkdir -p dns_with_named/{defaults,handlers,tasks,templates}
+mkdir -p dns_with_named_cf3/{defaults,handlers,tasks,templates}
+mkdir -p dns_with_named_cht/{defaults,handlers,tasks,templates}
+mkdir -p dns_with_named_dnj/{defaults,handlers,tasks,templates}
+mkdir -p link/{defaults,handlers,meta,tasks,tests,vars}
+mkdir -p logindefs/{defaults,handlers,meta,tasks,tests,vars}
+mkdir -p logrotate/{defaults,meta,tasks,templates,tests}
+mkdir -p motd/{defaults,handlers,meta,tasks,templates/etc,tests,vars}
+mkdir -p nftables_iptf/{defaults,handlers,meta,tasks,templates/dev,tests,vars}
+mkdir -p nmcli_bonding/{defaults,handlers,meta,tasks,tests,vars}
+mkdir -p ntpchrony/{defaults,files,handlers,meta,tasks,tests,vars}
+mkdir -p packages_add/{defaults,handlers,meta,tasks,templates,tests,vars}
+mkdir -p pam_iptf/{defaults,handlers,meta,tasks,tests,vars}
+mkdir -p seclimit/{defaults,handlers,meta,tasks,tests,vars}
+mkdir -p services/{defaults,handlers,meta,tasks,templates,tests,vars}
+mkdir -p snmp/{defaults,files,handlers,meta,tasks,templates,tests,vars}
+mkdir -p sshd/{defaults,handlers,meta,tasks,templates,tests,vars}
+mkdir -p sudo_iptf/{defaults,handlers,meta,tasks,templates,tests,vars}
+mkdir -p svc-ansible-apps/{defaults,handlers,meta,tasks,templates,tests,vars}
+mkdir -p sysctl/{defaults,handlers,tasks,vars}
+mkdir -p sysctl_master/{defaults,handlers,meta,tasks,test,vars}
+mkdir -p syslog/{defaults,files,handlers,meta,tasks,tests,vars}
+mkdir -p sysstat_common/{tasks,templates}
+mkdir -p umask/{defaults,handlers,meta,tasks,templates,tests,vars}
+mkdir -p usergroupdir/{defaults,handlers,meta,tasks,tests}
+
+# Create the files
+touch dns_with_named/defaults/main.yml
+touch dns_with_named/handlers/main.yml
+touch dns_with_named/tasks/main.yml
+touch dns_with_named/templates/{named.conf.cf3.j2,named.conf.cht.j2,named.conf.dnj.j2,named.conf.j2,named.conf.rch.j2,original_named.conf.j2,resolv.conf.j2,resolv.conf.j2.backup,resolv.conf.prod.j2,resolv.conf.test.j2}
+
+touch dns_with_named_cf3/defaults/main.yml
+touch dns_with_named_cf3/handlers/main.yml
+touch dns_with_named_cf3/tasks/main.yml
+touch dns_with_named_cf3/templates/{named.conf.j2,original_named.conf.j2,resolv.conf.j2,resolv.conf.j2.backup,resolv.conf.prod.j2,resolv.conf.test.j2}
+
+touch dns_with_named_cht/defaults/main.yml
+touch dns_with_named_cht/handlers/main.yml
+touch dns_with_named_cht/tasks/main.yml
+touch dns_with_named_cht/templates/{named.conf.j2,original_named.conf.j2,resolv.conf.j2,resolv.conf.j2.backup,resolv.conf.prod.j2,resolv.conf.test.j2}
+
+touch dns_with_named_dnj/defaults/main.yml
+touch dns_with_named_dnj/handlers/main.yml
+touch dns_with_named_dnj/tasks/main.yml
+touch dns_with_named_dnj/templates/{named.conf.j2,original_named.conf.j2,resolv.conf.j2,resolv.conf.j2.backup,resolv.conf.prod.j2,resolv.conf.test.j2}
+
+touch link/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,tests/{inventory,test.yml},vars/main.yml}
+
+touch logindefs/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,tests/{inventory,test.yml},vars/main.yml}
+
+touch logrotate/{README.md,defaults/main.yml,meta/main.yml,playbook.yaml,tasks/main.yml,templates/{logrotate.conf.j2,logrotate_d.j2,logrotate_rwtab.j2},tests/{inventory,test.yml}}
+
+touch motd/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/{backup.yml,main.yml},templates/etc/motd.j2,tests/{inventory,test.yml},vars/main.yml}
+
+touch nftables_iptf/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,templates/dev/nftables_rules.j2,tests/{inventory,test.yml},vars/main.yml}
+
+touch nmcli_bonding/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,tests/{inventory,test.yml},vars/main.yml}
+
+touch ntpchrony/{defaults/main.yml,files/{chrony.conf,ntp.conf,ntp_sles.conf},handlers/main.yml,meta/main.yml,tasks/main.yml,tests/{inventory,test.yml},vars/main.yml}
+
+touch packages_add/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,templates/removepkg.j2,tests/{inventory,test.yml},vars/main.yml}
+
+touch pam_iptf/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,tests/{inventory,test.yml},vars/main.yml}
+
+touch seclimit/{README.md,defaults/{main.yml,main.yml_backup},handlers/main.yml,meta/main.yml,playbook.yaml,tasks/{main.yml,main.yml.old},tests/{inventory,test.yml},vars/main.yml}
+
+touch services/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,templates/services.j2,tests/{inventory,test.yml},vars/main.yml}
+
+touch snmp/{README.md,defaults/main.yml,files/{snmp.conf,snmpd,snmp_restart.sh},handlers/main.yml,meta/main.yml,tasks/main.yml,templates/{hp_snmp_agents.sh.j2,snmpd.conf.erb.j2,snmpd.conf.et.dev.j2,snmpd.conf.j2},tests/{inventory,test.yml},vars/main.yml}
+
+touch sshd/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/{main_et.yml,main_ratt.yml,main.yml},templates/{sshd_config_et,sshd_config_non_prod,sshd_config_prod},tests/{inventory,test.yml},vars/main.yml}
+
+touch sudo_iptf/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/{main_admin.yml,main_build.yml,main_ecs_dev.yml,main_ecs_prod.yml,main_engine.yml,main_et.yml,main_ratt.yml,main_rnd.yml,main_sre_prod.yml,main_sre.yml,main.yml},templates/{sudo_admin.j2,sudo_cmadmin.j2,sudo_ecs_dev.j2,sudo_ecs_prod.j2,sudo_engine.j2,sudo_et_dev.j2,sudo_et_prod.j2,sudo_occas.j2,sudo_sre.j2,sudo_sre_prod.j2},tests/{inventory,test.yml},vars/main.yml}
+
+touch svc-ansible-apps/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/main.yml,templates/{svc-ansible-apps-non-prod.j2,svc-ansible-apps_non_prod.j2,svc-ansible-apps-prod.j2},tests/{inventory,test.yml},vars/main.yml}
+
+touch sysctl/{defaults/{main_admin.yml,main_engine.yml,main.yml},handlers/main.yml,tasks/main.yml,vars/main.yml}
+
+touch sysctl_master/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,playbook.yaml,tasks/main.yml,test/{ansible.cfg,ci-test-inventory,ci-test.yml,example-vars.yml,test-inventory,test.yml},vars/main.yml}
+
+touch syslog/{README.md,defaults/main.yml,files/{rsyslog,syslog},handlers/main.yml,meta/main.yml,tasks/main.yml,tests/{inventory,test.yml},vars/main.yml}
+
+touch sysstat_common/{tasks/main.yml,templates/{sysstat.erb.j2,sysstat.erb.j2.backup}}
+
+touch umask/{README.md,defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/{backup,main.yml},templates/{adduser.conf.j2,bashrc.j2,default_umask.fish.j2,default_umask.sh.j2,profile.j2,zshrc.j2},tests/{inventory,test.yml},vars/main.yml}
+
+touch usergroupdir/{defaults/main.yml,handlers/main.yml,meta/main.yml,tasks/{main_admin.yml,main_adm.yml,main_build.yml,main_ecs.yml,main_engine.yml,main_et.yml,main_ratt.yml,main_rnd.yml,main_sre.yml,main.yml},tests/{inventory,test.yml}}
